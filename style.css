@@ -81,3 +81,30 @@ body{
 .modal-body p{
   color: #333;
 }
+form{
+  position: relative;
+}
+form input{
+  background-color: #2B2B2B !important;
+  border: none !important;
+  padding: 20px !important;
+  border-bottom: 2px solid orange !important; 
+  outline: none !important;
+  color: white !important;
+}
+form input:focus{
+  box-shadow: none !important;
+  outline: none !important;
+}
+form button{
+  background-color: transparent;
+  border: none;
+}
+
+form button i {
+    position: absolute;
+    right: 13px;
+    top: 20px;
+    font-size: 24px;
+    color: orangered;
+}
