@@ -12,10 +12,13 @@ const humidityElement = document.querySelector("#humidity");
 const windElement = document.querySelector("#wind");
 const pressureElement = document.querySelector("#pressure");
 const feelLikeElement = document.querySelector("#feelLike");
+const queryElement = document.querySelector("#query");
+const searchElement = document.querySelector("#search");
 
 // initial data
+
 const apiKey = "126688fe7925400d81763c4bb6265bba";
-const cityName = "dhaka";
+let cityName = "dhaka";
 const dayList = [
   "Sunday",
   "Monday",
@@ -39,7 +42,12 @@ let monthList = [
   "November",
   "December",
 ];
-
+searchElement.addEventListener("click", function (e) {
+  e.preventDefault();
+  cityName = queryElement.value;
+  queryElement.value = '';
+  waitForResponse(cityName, apiKey).catch((err) => err);
+});
 // get time and date
 const setTimeAndDate = () => {
   let dateObj = new Date();
@@ -62,20 +70,20 @@ setInterval(() => {
 }, 1000);
 // call api
 let linkApi = async (cityName, apiKey) => {
-
-    let response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&units=imperial&appid=${apiKey}`
-    );
-    return await response.json();
+  let response = await fetch(
+    `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&units=imperial&appid=${apiKey}`
+  );
+  return await response.json();
 };
 
 let waitForResponse = async (cityName, apiKey) => {
   let getData = await linkApi(cityName, apiKey);
   cityCodeElement.innerText = getData.sys.country;
+  cityNameElement.innerText = cityName.charAt(0).toUpperCase() + cityName.slice(1) ;
   humidityElement.innerText = getData.main.humidity;
   windElement.innerText = getData.wind.speed;
   pressureElement.innerText = getData.main.pressure;
-  tempDescriptionElement.innerText = getData.weather[0].main;
+  tempDescriptionElement.innerText = getData.weather[0].description;
   // feelLikeElement.innerText = getData.main.feels_like;
   // mainTemperatureElement.innerText = Math.round(getData.main.temp);
   weatherImgElement.setAttribute(
@@ -83,10 +91,7 @@ let waitForResponse = async (cityName, apiKey) => {
     `http://openweathermap.org/img/w/${getData.weather[0].icon}.png`
   );
 
-
   console.log(getData);
 };
-
-waitForResponse(cityName, apiKey).catch((err) => err);
 
 // console.log(a);
