@@ -16,9 +16,8 @@ const queryElement = document.querySelector("#query");
 const searchElement = document.querySelector("#search");
 
 // initial data
-
 const apiKey = "126688fe7925400d81763c4bb6265bba";
-let cityName = "dhaka";
+let cityName = "Dhaka";
 const dayList = [
   "Sunday",
   "Monday",
@@ -42,11 +41,28 @@ let monthList = [
   "November",
   "December",
 ];
+// allow to get your location weather
+window.onload = () => {
+  navigator.geolocation.getCurrentPosition(
+    (success) => {
+      console.log(success.coords);
+      let lat = success.coords.latitude;
+      let lon = success.coords.longitude;
+      waitForResponse(lat, lon, "", apiKey).catch((err) => err);
+    },
+    function errorCallback(error) {
+      if (error.code == error.PERMISSION_DENIED) {
+        waitForResponse("", "", cityName, apiKey).catch((err) => err);
+      }
+    }
+  );
+};
+// search weather
 searchElement.addEventListener("click", function (e) {
   e.preventDefault();
   cityName = queryElement.value;
-  queryElement.value = '';
-  waitForResponse(cityName, apiKey).catch((err) => err);
+  queryElement.value = "";
+  waitForResponse("", "", cityName, apiKey).catch((err) => err);
 });
 // get time and date
 const setTimeAndDate = () => {
@@ -65,33 +81,56 @@ const setTimeAndDate = () => {
     return (localTimeElement.innerHTML = `${hour}:${minute}:${seconds} ${am_pm}`);
   };
 };
+// set time
 setInterval(() => {
   setTimeAndDate()();
 }, 1000);
 // call api
-let linkApi = async (cityName, apiKey) => {
+let linkApi = async (lat, lon, cityName, apiKey) => {
   let response = await fetch(
-    `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&units=imperial&appid=${apiKey}`
+    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&q=${cityName}&units=imperial&appid=${apiKey}`
   );
   return await response.json();
 };
 
-let waitForResponse = async (cityName, apiKey) => {
-  let getData = await linkApi(cityName, apiKey);
+let waitForResponse = async (lat, lon, cityName, apiKey) => {
+  let getData = await linkApi(lat, lon, cityName, apiKey);
+  // set data
   cityCodeElement.innerText = getData.sys.country;
-  cityNameElement.innerText = cityName.charAt(0).toUpperCase() + cityName.slice(1) ;
+  cityNameElement.innerText =
+    getData.name === "Sāmāir" ? "Dhaka" : getData.name;
   humidityElement.innerText = getData.main.humidity;
   windElement.innerText = getData.wind.speed;
   pressureElement.innerText = getData.main.pressure;
   tempDescriptionElement.innerText = getData.weather[0].description;
-  // feelLikeElement.innerText = getData.main.feels_like;
-  // mainTemperatureElement.innerText = Math.round(getData.main.temp);
+  // celsius to fahrenheit
+  fahrenheitElement.addEventListener("click", function () {
+    feelLikeElement.innerText = Math.round(getData.main.feels_like);
+    mainTemperatureElement.innerText = Math.round(getData.main.temp);
+    // add and remove active class
+    celsiusElement.classList.remove("active");
+    fahrenheitElement.classList.add("active");
+  });
+  // fahrenheit to celsius
+  celsiusElement.addEventListener("click", function () {
+    feelLikeElement.innerText = Math.round(
+      (getData.main.feels_like - 32) * 0.5556
+    );
+    mainTemperatureElement.innerText = Math.round(
+      (getData.main.temp - 32) * 0.5556
+    );
+    // add and remove active class
+    celsiusElement.classList.add("active");
+    fahrenheitElement.classList.remove("active");
+  });
+  feelLikeElement.innerText = Math.round(
+    (getData.main.feels_like - 32) * 0.5556
+  );
+  mainTemperatureElement.innerText = Math.round(
+    (getData.main.temp - 32) * 0.5556
+  );
   weatherImgElement.setAttribute(
     "src",
     `http://openweathermap.org/img/w/${getData.weather[0].icon}.png`
   );
-
-  console.log(getData);
 };
-
-// console.log(a);
