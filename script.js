@@ -45,7 +45,6 @@ let monthList = [
 window.onload = () => {
   navigator.geolocation.getCurrentPosition(
     (success) => {
-      console.log(success.coords);
       let lat = success.coords.latitude;
       let lon = success.coords.longitude;
       waitForResponse(lat, lon, "", apiKey).catch((err) => err);
@@ -60,9 +59,23 @@ window.onload = () => {
 // search weather
 searchElement.addEventListener("click", function (e) {
   e.preventDefault();
-  cityName = queryElement.value;
-  queryElement.value = "";
-  waitForResponse("", "", cityName, apiKey).catch((err) => err);
+  if (queryElement.value) {
+    cityName = queryElement.value;
+    queryElement.value = "";
+    waitForResponse("", "", cityName, apiKey).catch((err) => {
+      queryElement.placeholder = "not a valid country or city name";
+      queryElement.classList.add("error");
+    });
+  } else {
+    queryElement.placeholder = "please enter a valid city name";
+    queryElement.classList.add("error");
+    if (queryElement.classList.contains("error")) {
+      setTimeout(() => {
+        queryElement.placeholder = "search by city name";
+        queryElement.classList.remove("error");
+      }, 2000);
+    }
+  }
 });
 // get time and date
 const setTimeAndDate = () => {

@@ -92,9 +92,15 @@ form input{
   outline: none !important;
   color: white !important;
 }
+form input::placeholder{
+  color: rgb(112, 112, 112) !important;
+}
 form input:focus{
   box-shadow: none !important;
   outline: none !important;
+}
+.error::placeholder{
+  color: #ff2d2d !important;
 }
 form button{
   background-color: transparent;
