@@ -65,6 +65,10 @@ searchElement.addEventListener("click", function (e) {
     waitForResponse("", "", cityName, apiKey).catch((err) => {
       queryElement.placeholder = "not a valid country or city name";
       queryElement.classList.add("error");
+      setTimeout(() => {
+        queryElement.placeholder = "search by city name";
+        queryElement.classList.remove("error");
+      }, 2000);
     });
   } else {
     queryElement.placeholder = "please enter a valid city name";
